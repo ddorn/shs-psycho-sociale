@@ -6,19 +6,52 @@ date: "3/2/2022"
 output: html_document
 ---
 
+```{r}
+library(tidyverse)
+
+#Visualisation
+library(ggplot2)
+library(ggthemes)
+library(stats)
+library(plotrix)
+library(psych)
+
+```
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+## Tri des données
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+Nous avons supprimé les colonnes non-pertinantes pour notre étude. Le fichier resultant est [shs-1-only-interesting-columns.csv](./../data/shs-only-interesting-columns.csv).
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+Nous avons ensuite suprimé les colonnes de personnes n'ayant pas répondu aux questions de notre groupe (sur la MEJ):
+[shs-2-removed-no-MEJ-response.csv](./../data/shs-2-removed-no-MEJ-response.csv)
 
-```{r cars}
-summary(cars)
+Ensuite, nous avons supprimé toutes les réponses faites en moins de 10 minutes ou en plus d'une heure car cela ne semble pas une durée plausible pour répondre à l'enquête.
+
+```{r}
+all.dat <- read_csv("../data/final.csv")
 ```
+
+## Description des données
+
+```{r}
+describe(all.dat)
+```
+NOTE: Qu'est-ce que je fais avec les gens non H/F ?
+
+```{r}
+group_by(all.dat, genre) %>% 
+  dplyr::summarise(
+    Nombre = n(), 
+    Mediane = median(MEJ_1, na.rm = TRUE),
+    EcartIQ = IQR(MEJ_1, na.rm = TRUE),
+    Moyenne = mean(MEJ_1, na.rm = TRUE)
+  )
+```
+
 
 ## Including Plots
 
