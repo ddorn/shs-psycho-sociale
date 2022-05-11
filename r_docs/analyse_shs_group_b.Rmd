@@ -55,8 +55,8 @@ group_by(all.dat, genre) %>%
 ```{r Add scenario }
 
 all.dat$decr_scen <- is.na(all.dat["manifeste_time_d_First Click"])*1
+all.dat$decr_scen <- factor(all.dat$decr_scen, labels = c('Croissant','Decroissant'))
 t <- table(all.dat$decr_scen)
-names(t) <- c('Croissant','Décroissant')
 t
 
 ```
@@ -64,16 +64,57 @@ t
 ```{r Replace 'Je sais pas' with NaN}
 
 mej.dat <- all.dat[grepl( "MEJ_" , names(all.dat))]
-mej.dat[mej.dat == 10] <- NaN
-view(mej.dat)
+all.dat[grepl( "MEJ_" , names(all.dat))][mej.dat == 10] <- NaN
+view(all.dat)
 
 ```
 
+```{r keep Masculin/Féminin}
+all.dat <- all.dat[all.dat$genre %in% c(1,2),]
+all.dat$genre <- factor(all.dat$genre,labels =c('Femme','Homme'))
+```
+
+
 ```{r}
-MEJ_1.boxplot <- ggplot(tuto.dat, aes(sex, hi_salary)) # créer l'objet ainsi que insérer les data
-hi_salary.boxplot + # + ajoute les layers
+
+MEJ_1.boxplot <- ggplot(all.dat, aes(genre, MEJ_1)) # créer l'objet ainsi que insérer les data
+MEJ_1.boxplot + # + ajoute les layers
   geom_boxplot(size = 0.7,  alpha = 1, colour = "black", fill ="orange") + # quelques options du geom
-  labs(x = "axe des x", y = "axe des y", title = "titre", subtitle = "sous-titre", caption = "légende")+ # les légendes 
+  labs(x = "Genre", y = "MEJ_1 score", title = "MEJ_1 score en fonction du genre")+ # les légendes 
   theme_bw() # un theme pour faire joli
+```
+
+```{r}
+library(plyr)
+df <- ddply(all.dat, c("decr_scen", "genre"), dplyr::summarize,
+            Mean = mean(MEJ_1, na.rm=T),
+            SE   = std.error(MEJ_1, na.rm=T))
+df
+```
+
+
+```{r }
+MEJ_1.bar <- ggplot(df, aes(x = decr_scen, y = Mean, fill = genre)) 
+MEJ_1.bar +
+  geom_bar(stat = "identity", position = "dodge") + 
+  ggtitle("XXX") + 
+  ylab("Score") +
+  geom_errorbar(aes(ymin = Mean-SE, ymax = Mean+SE), width = 0.2, position = position_dodge(0.9)) +
+  theme_bw()
+```
+```{r}
+MEJ_1.tab <- ddply(all.dat, .(decr_scen, genre),  # créer l'objet
+                     dplyr::summarise, val=mean(MEJ_1, na.rm=T))
+MEJ_1.tab # controler l'objet
+```
+
+```{r}
+interaction.plot <- ggplot(all.dat, aes(x=decr_scen, y=MEJ_1, colour=genre)) 
+interaction.plot + 
+  geom_boxplot() + 
+  geom_point(data = MEJ_1.tab, aes(y = val)) +
+  geom_line(data = MEJ_1.tab, aes(y = val, group = genre)) + 
+  ggtitle("Score en fonction de...") + ylab("Score de ...") +
+  theme_bw()
 ```
 
