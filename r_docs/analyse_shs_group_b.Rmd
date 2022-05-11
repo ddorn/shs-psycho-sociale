@@ -26,7 +26,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Nous avons supprimé les colonnes non-pertinantes pour notre étude. Le fichier resultant est [shs-1-only-interesting-columns.csv](./../data/shs-only-interesting-columns.csv).
 
-Nous avons ensuite suprimé les colonnes de personnes n'ayant pas répondu aux questions de notre groupe (sur la MEJ):
+Nous avons ensuite supprimé les colonnes de personnes n'ayant pas répondu aux questions de notre groupe (sur la MEJ):
 [shs-2-removed-no-MEJ-response.csv](./../data/shs-2-removed-no-MEJ-response.csv)
 
 Ensuite, nous avons supprimé toutes les réponses faites en moins de 10 minutes ou en plus d'une heure car cela ne semble pas une durée plausible pour répondre à l'enquête.
@@ -52,13 +52,28 @@ group_by(all.dat, genre) %>%
   )
 ```
 
+```{r Add scenario }
 
-## Including Plots
+all.dat$decr_scen <- is.na(all.dat["manifeste_time_d_First Click"])*1
+t <- table(all.dat$decr_scen)
+names(t) <- c('Croissant','Décroissant')
+t
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r Replace 'Je sais pas' with NaN}
+
+mej.dat <- all.dat[grepl( "MEJ_" , names(all.dat))]
+mej.dat[mej.dat == 10] <- NaN
+view(mej.dat)
+
+```
+
+```{r}
+MEJ_1.boxplot <- ggplot(tuto.dat, aes(sex, hi_salary)) # créer l'objet ainsi que insérer les data
+hi_salary.boxplot + # + ajoute les layers
+  geom_boxplot(size = 0.7,  alpha = 1, colour = "black", fill ="orange") + # quelques options du geom
+  labs(x = "axe des x", y = "axe des y", title = "titre", subtitle = "sous-titre", caption = "légende")+ # les légendes 
+  theme_bw() # un theme pour faire joli
+```
+
