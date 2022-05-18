@@ -122,6 +122,8 @@ interaction.plot +
 all.dat$pro_meat <- rowMeans(all.dat[c("MEJ_1","MEJ_2","MEJ_3")],na.rm=TRUE)
 all.dat$deny <- rowMeans(all.dat[c("MEJ_4","MEJ_5","MEJ_6")],na.rm=TRUE)
 all.dat$hier_just <- rowMeans(all.dat[c("MEJ_7","MEJ_8","MEJ_9")],na.rm=TRUE)
+all.dat$all_MEJ <- rowMeans(all.dat[c("MEJ_1","MEJ_2","MEJ_3","MEJ_4","MEJ_5","MEJ_6","MEJ_7","MEJ_8","MEJ_9")],na.rm=TRUE)
+
 
 ```
 
@@ -259,3 +261,91 @@ interaction.plot +
   ggtitle("Score de Hier_just en fonction du scenario et du genre") + ylab("Score de Hier_just") + xlab("Scenario") +
   theme_bw()
 ```
+```{r}
+example.plot <- ggplot(all.dat, aes(decr_scen, deny, colour = genre)) +
+  geom_point(position = position_jitter(width = 0.3, height = 0.1)) + 
+  geom_smooth(aes(group = genre),method = lm) +
+  labs(
+    title = "Scatterplots for test scores",
+    subtitle = "s",
+    caption = "c",
+    x = "x",
+    y = "y") +
+  theme_bw()
+
+example.plot
+```
+
+```{r}
+ggplot(all.dat, aes(x=unclass(all.dat$decr_scen), y=hier_just, fill=genre, color=genre)) + 
+        geom_point(size = 1.5) + 
+        labs(x = "Scenario", y ="Score PRO_MEAT", colour = "Genre") +
+        scale_color_manual(values=c('#999999','#E69F00')) +
+        scale_fill_manual(values =c('#999999','#E69F00')) +
+        guides(fill = FALSE) +
+        geom_smooth(method=lm) +
+        theme_bw()
+
+```
+
+```{r}
+
+pro_meat_group <- all.dat[, c("MEJ_1",  "MEJ_2",   "MEJ_3")]
+psych::alpha(pro_meat_group)
+
+deny_group <- all.dat[, c("MEJ_4",  "MEJ_5",   "MEJ_6")]
+psych::alpha(deny_group)
+
+hier_just_group <- all.dat[, c("MEJ_7",  "MEJ_8",   "MEJ_9")]
+psych::alpha(hier_just_group)
+
+all_group <- all.dat[, c("MEJ_1",  "MEJ_2",   "MEJ_3", "MEJ_4",  "MEJ_5",   "MEJ_6", "MEJ_7",  "MEJ_8",   "MEJ_9")]
+psych::alpha(all_group)
+```
+
+```{r}
+
+model.1 <- lm(hier_just ~ genre*decr_scen, data = all.dat, na.action = na.omit)
+summary(model.1)
+```
+
+```{r}
+library(plyr)
+df <- ddply(all.dat, c("decr_scen", "genre"), dplyr::summarize,
+            Mean = mean(all_MEJ, na.rm=T),
+            SE   = std.error(all_MEJ, na.rm=T))
+df
+```
+
+
+```{r }
+MEJ_g1.bar <- ggplot(df, aes(x = decr_scen, y = Mean, fill = genre)) 
+MEJ_g1.bar +
+  geom_bar(stat = "identity", position = "dodge") + 
+  ggtitle("All_mej") + 
+  ylab("Score") +
+  geom_errorbar(aes(ymin = Mean-SE, ymax = Mean+SE), width = 0.2, position = position_dodge(0.9)) +
+  theme_bw()
+```
+
+
+```{r}
+MEJ_g1.tab <- ddply(all.dat, .(decr_scen, genre),  # créer l'objet
+                     dplyr::summarise, val=mean(all_MEJ, na.rm=T))
+MEJ_g1.tab # controler l'objet
+```
+
+```{r}
+interaction.plot <- ggplot(all.dat, aes(x=decr_scen, y=all_MEJ, colour=genre)) 
+interaction.plot + 
+  geom_boxplot() + 
+  geom_point(data = MEJ_g1.tab, aes(y = val)) +
+  geom_line(data = MEJ_g1.tab, aes(y = val, group = genre),size=2) + 
+  ggtitle("Score de ALL_MEJ en fonction du scenario et du genre") + ylab("Score de ALL_MEJ") + xlab("Scenario") +
+  theme_bw()
+```
+```{r}
+model.1 <- lm(all_MEJ ~ genre*decr_scen, data = all.dat, na.action = na.omit)
+summary(model.1)
+```
+
