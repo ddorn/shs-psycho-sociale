@@ -117,4 +117,145 @@ interaction.plot +
   ggtitle("Score en fonction de...") + ylab("Score de ...") +
   theme_bw()
 ```
+```{r}
 
+all.dat$pro_meat <- rowMeans(all.dat[c("MEJ_1","MEJ_2","MEJ_3")],na.rm=TRUE)
+all.dat$deny <- rowMeans(all.dat[c("MEJ_4","MEJ_5","MEJ_6")],na.rm=TRUE)
+all.dat$hier_just <- rowMeans(all.dat[c("MEJ_7","MEJ_8","MEJ_9")],na.rm=TRUE)
+
+```
+
+
+```{r}
+
+MEJ_g1.boxplot <- ggplot(all.dat, aes(genre, pro_meat)) # créer l'objet ainsi que insérer les data
+MEJ_g1.boxplot + # + ajoute les layers
+  geom_boxplot(size = 0.7,  alpha = 1, colour = "black", fill ="orange") + # quelques options du geom
+  labs(x = "Genre", y = "Pro_meat score", title = "Pro_meat score en fonction du genre")+ # les légendes 
+  theme_bw() # un theme pour faire joli
+```
+
+```{r}
+library(plyr)
+df <- ddply(all.dat, c("decr_scen", "genre"), dplyr::summarize,
+            Mean = mean(pro_meat, na.rm=T),
+            SE   = std.error(pro_meat, na.rm=T))
+df
+```
+
+
+```{r }
+MEJ_g1.bar <- ggplot(df, aes(x = decr_scen, y = Mean, fill = genre)) 
+MEJ_g1.bar +
+  geom_bar(stat = "identity", position = "dodge") + 
+  ggtitle("XXX") + 
+  ylab("Score") +
+  geom_errorbar(aes(ymin = Mean-SE, ymax = Mean+SE), width = 0.2, position = position_dodge(0.9)) +
+  theme_bw()
+```
+
+```{r}
+MEJ_g1.tab <- ddply(all.dat, .(decr_scen, genre),  # créer l'objet
+                     dplyr::summarise, val=mean(pro_meat, na.rm=T))
+MEJ_g1.tab # controler l'objet
+```
+
+```{r}
+interaction.plot <- ggplot(all.dat, aes(x=decr_scen, y=pro_meat, colour=genre)) 
+interaction.plot + 
+  geom_boxplot() + 
+  geom_point(data = MEJ_g1.tab, aes(y = val)) +
+  geom_line(data = MEJ_g1.tab, aes(y = val, group = genre),size=2) + 
+  ggtitle("Score en fonction du scenario et du genre") + ylab("Score de PRO_MEAT") + xlab("Scenario") +
+  theme_bw()
+```
+
+
+```{r, warning=F}
+
+MEJ_g1.boxplot <- ggplot(all.dat, aes(genre, deny)) # créer l'objet ainsi que insérer les data
+MEJ_g1.boxplot + # + ajoute les layers
+  geom_boxplot(size = 0.7,  alpha = 1, colour = "black", fill ="orange") + # quelques options du geom
+  labs(x = "Genre", y = "Deny score", title = "Deny score en fonction du genre")+ # les légendes 
+  theme_bw() # un theme pour faire joli
+```
+
+```{r}
+library(plyr)
+df <- ddply(all.dat, c("decr_scen", "genre"), dplyr::summarize,
+            Mean = mean(deny, na.rm=T),
+            SE   = std.error(deny, na.rm=T))
+df
+```
+
+
+```{r }
+MEJ_g1.bar <- ggplot(df, aes(x = decr_scen, y = Mean, fill = genre)) 
+MEJ_g1.bar +
+  geom_bar(stat = "identity", position = "dodge") + 
+  ggtitle("Deny score") + 
+  ylab("Score") +
+  geom_errorbar(aes(ymin = Mean-SE, ymax = Mean+SE), width = 0.2, position = position_dodge(0.9)) +
+  theme_bw()
+```
+
+```{r}
+MEJ_g1.tab <- ddply(all.dat, .(decr_scen, genre),  # créer l'objet
+                     dplyr::summarise, val=mean(deny, na.rm=T))
+MEJ_g1.tab # controler l'objet
+```
+
+```{r}
+interaction.plot <- ggplot(all.dat, aes(x=decr_scen, y=deny, colour=genre)) 
+interaction.plot + 
+  geom_boxplot() + 
+  geom_point(data = MEJ_g1.tab, aes(y = val)) +
+  geom_line(data = MEJ_g1.tab, aes(y = val, group = genre),size=2) + 
+  ggtitle("Score DENY en fonction du scenario et du genre") + ylab("Score de Deny") + xlab("Scenario") +
+  theme_bw()
+
+```
+
+```{r}
+
+MEJ_g1.boxplot <- ggplot(all.dat, aes(genre, hier_just)) # créer l'objet ainsi que insérer les data
+MEJ_g1.boxplot + # + ajoute les layers
+  geom_boxplot(size = 0.7,  alpha = 1, colour = "black", fill ="orange") + # quelques options du geom
+  labs(x = "Genre", y = "Hier_just score", title = "Hier_just score en fonction du genre")+ # les légendes 
+  theme_bw() # un theme pour faire joli
+```
+
+```{r}
+library(plyr)
+df <- ddply(all.dat, c("decr_scen", "genre"), dplyr::summarize,
+            Mean = mean(hier_just, na.rm=T),
+            SE   = std.error(hier_just, na.rm=T))
+df
+```
+
+
+```{r }
+MEJ_g1.bar <- ggplot(df, aes(x = decr_scen, y = Mean, fill = genre)) 
+MEJ_g1.bar +
+  geom_bar(stat = "identity", position = "dodge") + 
+  ggtitle("HIER_JUST") + 
+  ylab("Score") +
+  geom_errorbar(aes(ymin = Mean-SE, ymax = Mean+SE), width = 0.2, position = position_dodge(0.9)) +
+  theme_bw()
+```
+
+```{r}
+MEJ_g1.tab <- ddply(all.dat, .(decr_scen, genre),  # créer l'objet
+                     dplyr::summarise, val=mean(hier_just, na.rm=T))
+MEJ_g1.tab # controler l'objet
+```
+
+```{r}
+interaction.plot <- ggplot(all.dat, aes(x=decr_scen, y=hier_just, colour=genre)) 
+interaction.plot + 
+  geom_boxplot() + 
+  geom_point(data = MEJ_g1.tab, aes(y = val)) +
+  geom_line(data = MEJ_g1.tab, aes(y = val, group = genre),size=2) + 
+  ggtitle("Score de Hier_just en fonction du scenario et du genre") + ylab("Score de Hier_just") + xlab("Scenario") +
+  theme_bw()
+```
