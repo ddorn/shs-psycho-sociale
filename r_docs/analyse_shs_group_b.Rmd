@@ -61,7 +61,9 @@ t
 
 ```
 
-```{r Replace 'Je sais pas' with NaN}
+Replace 'Je sais pas' with NaN
+
+```{r}
 
 mej.dat <- all.dat[grepl( "MEJ_" , names(all.dat))]
 all.dat[grepl( "MEJ_" , names(all.dat))][mej.dat == 10] <- NaN
@@ -69,7 +71,9 @@ view(all.dat)
 
 ```
 
-```{r keep Masculin/Féminin}
+keep Masculin/Féminin
+
+```{r}
 all.dat <- all.dat[all.dat$genre %in% c(1,2),]
 all.dat$genre <- factor(all.dat$genre,labels =c('Femme','Homme'))
 ```
